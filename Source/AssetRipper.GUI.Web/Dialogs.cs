@@ -1,6 +1,7 @@
 ﻿using AssetRipper.Web.Extensions;
 using Microsoft.AspNetCore.Http;
 using NativeFileDialogs.Net;
+using System.Net.Mime;
 
 namespace AssetRipper.GUI.Web;
 
@@ -10,20 +11,32 @@ internal static class Dialogs
 
 	public static class OpenFiles
 	{
-		public static Task HandleGetRequest(HttpContext context)
+		public static async Task HandleGetRequest(HttpContext context)
 		{
 			context.Response.DisableCaching();
-			NfdStatus status = GetUserInput(out string[]? paths);
+			var paths = await GetUserInputAsync();
 			//Maybe do something else when user cancels the dialog?
-			return Results.Json(paths ?? [], AppJsonSerializerContext.Default.StringArray).ExecuteAsync(context);
-		}
+			var result = Results.Json(paths ?? Array.Empty<string>(), AppJsonSerializerContext.Default.StringArray);
+			await context.Response.WriteAsJsonAsync(paths ?? Array.Empty<string>());		}
 
-		public static NfdStatus GetUserInput(out string[]? paths, IDictionary<string, string>? filters = null, string? defaultPath = null)
+		public static async Task<string[]> GetUserInputAsync(IDictionary<string, string>? filters = null, string? defaultPath = null)
 		{
-			lock (lockObject)
+			NfdStatus status = NfdStatus.Cancelled; // Replace with the actual default or error status
+			string[]? paths = null;
+
+			try
 			{
-				return Nfd.OpenDialogMultiple(out paths, filters, defaultPath);
+				// Assuming Nfd.OpenDialogMultiple is an asynchronous method that can be awaited
+				// If it's not, you'll need to find a way to call it correctly in the context of ASP.NET Core
+				status = Nfd.OpenDialogMultiple(out paths, filters, defaultPath);
 			}
+			catch (Exception ex)
+			{
+				// Handle any exceptions that might occur
+				// Log the exception, set the status to an error, etc.
+			}
+
+			return paths;
 		}
 	}
 
@@ -39,10 +52,11 @@ internal static class Dialogs
 
 		public static NfdStatus GetUserInput(out string? path, IDictionary<string, string>? filters = null, string? defaultPath = null)
 		{
-			lock (lockObject)
-			{
+			// lock (lockObject)
+			// {
+				
 				return Nfd.OpenDialog(out path, filters, defaultPath);
-			}
+			// }
 		}
 	}
 

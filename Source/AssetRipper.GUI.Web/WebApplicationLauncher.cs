@@ -92,6 +92,7 @@ public static class WebApplicationLauncher
 			context.Response.DisableCaching();
 			return SettingsPage.Instance.WriteToResponse(context.Response);
 		});
+		app.MapGet("/UITest", () => FileDialog.Instance.ToResult());
 		app.MapPost("/Settings/Update", SettingsPage.HandlePostRequest);
 		app.MapPost("/Assets/View", Pages.Assets.ViewPage.HandlePostRequest);
 		app.MapPost("/Bundles/View", Pages.Bundles.ViewPage.HandlePostRequest);

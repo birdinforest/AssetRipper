@@ -119,6 +119,7 @@
     "menu_file": "File",
     "menu_file_exit": "Exit",
     "menu_file_open_file": "Open File",
+    "menu_ui_test": "Open File Test",
     "menu_file_open_folder": "Open Folder",
     "menu_file_reset": "Reset",
     "menu_language": "Language",

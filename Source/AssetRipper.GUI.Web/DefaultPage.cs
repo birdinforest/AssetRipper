@@ -43,6 +43,11 @@ public abstract class DefaultPage : HtmlPage
 								}
 								using (new Li(writer).End())
 								{
+									// WritePostLink(writer, "/UITest", Localization.MenuUITest, "dropdown-item");
+									new A(writer).WithClass("dropdown-item").WithHref("/UITest").Close(Localization.MenuUITest);
+								}
+								using (new Li(writer).End())
+								{
 									new Hr(writer).WithClass("dropdown-divider").Close();
 								}
 								using (new Li(writer).End())

@@ -611,6 +611,11 @@ partial class Localization
 	public static string MenuFileOpenFile => Get("menu_file_open_file");
 	
 	/// <summary>
+	/// Open File
+	/// </summary>
+	public static string MenuUITest => Get("menu_ui_test");
+	
+	/// <summary>
 	/// Open Folder
 	/// </summary>
 	public static string MenuFileOpenFolder => Get("menu_file_open_folder");

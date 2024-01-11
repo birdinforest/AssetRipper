@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using System.Diagnostics;
 
 namespace AssetRipper.GUI.Web.Pages;
 
@@ -11,15 +12,17 @@ public static class Commands
 		{
 			IFormCollection form = await request.ReadFormAsync();
 
-			string[]? paths;
+			string[]? paths = new string[] { };
 			if (form.TryGetValue("Path", out StringValues values))
 			{
 				paths = values;
 			}
 			else
 			{
-				Dialogs.OpenFiles.GetUserInput(out paths);
+				// paths = await Dialogs.OpenFiles.GetUserInputAsync();
 			}
+			
+			Console.WriteLine($"LoadFile. values: {values} paths.Length: {paths.Length} paths: {paths[0]}");
 
 			if (paths is { Length: > 0 })
 			{
@@ -32,6 +35,7 @@ public static class Commands
 	{
 		static async Task ICommand.Start(HttpRequest request)
 		{
+			Console.WriteLine($"LoadFolder.");
 			IFormCollection form = await request.ReadFormAsync();
 
 			string? path;
@@ -55,6 +59,7 @@ public static class Commands
 	{
 		static async Task ICommand.Start(HttpRequest request)
 		{
+			Console.WriteLine($"Export.");
 			IFormCollection form = await request.ReadFormAsync();
 
 			string? path;
@@ -78,13 +83,25 @@ public static class Commands
 	{
 		static Task ICommand.Start(HttpRequest request)
 		{
+			Console.WriteLine($"Reset.");
 			GameFileLoader.Reset();
 			return Task.CompletedTask;
+		}
+	}
+	
+	public readonly struct UITest : ICommand
+	{
+		static async Task ICommand.Start(HttpRequest request)
+		{
+			Console.WriteLine($"UITest.");
+			IFormCollection form = await request.ReadFormAsync();
+			Console.WriteLine("UITest clicked");
 		}
 	}
 
 	public static Task HandleCommand<T>(HttpContext context) where T : ICommand
 	{
+		Console.WriteLine($"HandleCommand context:{context}");
 		context.Response.Redirect(T.RedirectionTarget);
 		return T.Start(context.Request);
 	}
