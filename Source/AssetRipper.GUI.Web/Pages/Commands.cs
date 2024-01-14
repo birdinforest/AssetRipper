@@ -19,7 +19,7 @@ public static class Commands
 			}
 			else
 			{
-				// paths = await Dialogs.OpenFiles.GetUserInputAsync();
+				paths = await Dialogs.OpenFiles.GetUserInputAsync();
 			}
 			
 			Console.WriteLine($"LoadFile. values: {values} paths.Length: {paths.Length} paths: {paths[0]}");

@@ -1,6 +1,7 @@
 ﻿using AssetRipper.Web.Extensions;
 using Microsoft.AspNetCore.Http;
 using NativeFileDialogs.Net;
+using System.Diagnostics;
 using System.Net.Mime;
 
 namespace AssetRipper.GUI.Web;
@@ -8,6 +9,24 @@ namespace AssetRipper.GUI.Web;
 internal static class Dialogs
 {
 	private static readonly object lockObject = new();
+	
+	private static void StartFileDialogServerProcess()
+	{
+		string serverExecutablePath = @"../AssetRipper.GUI.FileDialog/bin/Debug/AssetRipper.GUI.FileDialog";
+
+		try
+		{
+			Process serverProcess = new Process();
+			serverProcess.StartInfo.FileName = serverExecutablePath;
+			serverProcess.StartInfo.CreateNoWindow = true;
+			serverProcess.StartInfo.UseShellExecute = false;
+			serverProcess.Start();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error starting server process: {ex.Message}");
+		}
+	}
 
 	public static class OpenFiles
 	{
@@ -17,25 +36,23 @@ internal static class Dialogs
 			var paths = await GetUserInputAsync();
 			//Maybe do something else when user cancels the dialog?
 			var result = Results.Json(paths ?? Array.Empty<string>(), AppJsonSerializerContext.Default.StringArray);
-			await context.Response.WriteAsJsonAsync(paths ?? Array.Empty<string>());		}
+			await context.Response.WriteAsJsonAsync(paths ?? Array.Empty<string>());
+		}
 
 		public static async Task<string[]> GetUserInputAsync(IDictionary<string, string>? filters = null, string? defaultPath = null)
 		{
-			NfdStatus status = NfdStatus.Cancelled; // Replace with the actual default or error status
-			string[]? paths = null;
-
-			try
+			StartFileDialogServerProcess();
+			var ipcClient = new IpcClient();
+			Console.WriteLine($"GetUserInputAsync establish ipcClient {ipcClient}");
+			string[]? paths = await ipcClient.SendOpenFileDialogRequest();
+			if (paths is {Length: > 0})
 			{
-				// Assuming Nfd.OpenDialogMultiple is an asynchronous method that can be awaited
-				// If it's not, you'll need to find a way to call it correctly in the context of ASP.NET Core
-				status = Nfd.OpenDialogMultiple(out paths, filters, defaultPath);
+				Console.WriteLine($"GetUserInputAsync get paths. Length: {paths.Length} Paths: {paths[0]}");
 			}
-			catch (Exception ex)
+			else
 			{
-				// Handle any exceptions that might occur
-				// Log the exception, set the status to an error, etc.
+				Console.WriteLine($"GetUserInputAsync get empty paths.");
 			}
-
 			return paths;
 		}
 	}

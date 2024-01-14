@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using System.Diagnostics;
+using NativeFileDialogs.Net;
 
 namespace AssetRipper.GUI.Web;
 
@@ -22,6 +23,10 @@ public static class WebApplicationLauncher
 	public static void Launch()
 	{
 		WelcomeMessage.Print();
+		
+		// string[]? paths;
+		// Nfd.OpenDialogMultiple(out paths);
+		// Dialogs.OpenNfd();
 
 		Logger.Add(new FileLogger());
 		Logger.LogSystemInformation("AssetRipper");
